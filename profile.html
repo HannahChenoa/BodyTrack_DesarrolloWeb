@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BodyTrack - Perfil</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 600px;
+    }
+  </style>
+
+  <script>
+    function editarPerfil() {
+      inputName.removeAttribute('readonly');
+      inputEmail.removeAttribute('readonly');
+      genderInput.removeAttribute('disabled');
+
+      document.getElementById('editProfileBtn').style.display = 'inline-block';
+      document.getElementById('btnEditar').style.display = 'none';
+    }
+
+
+    function guardarPerfil() {
+      const inputs = document.querySelectorAll('.perfil-info input');
+      inputs.forEach(input => input.setAttribute('readonly', 'readonly'));
+      document.getElementById('btnGuardar').style.display = 'none';
+      document.getElementById('btnEditar').style.display = 'inline-block';
+      alert('Datos guardados correctamente.');
+    }
+
+    function agregarMedida() {
+      const parte = document.getElementById('parteCuerpo').value;
+      const medida = document.getElementById('medida').value;
+
+      if (parte && medida) {
+        const lista = document.getElementById('listaMedidas');
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${parte}: ${medida} cm`;
+        lista.appendChild(item);
+
+        document.getElementById('parteCuerpo').value = '';
+        document.getElementById('medida').value = '';
+      } else {
+        alert('Completa ambos campos.');
+      }
+    }
+  </script>
+</head>
+
+<body class="d-flex justify-content-center align-items-center p-4">
+
+  <div class="card shadow p-4">
+    <div class="mb-4 text-center">
+      <a href="home.html" class="btn btn-secondary">← Volver al Inicio</a>
+    </div>
+    <h2 class="text-center mb-4">Perfil de Usuario</h2>
+
+    <div class="perfil-info">
+      <div class="mb-3">
+        <label class="form-label">Nombre completo</label>
+        <input type="text" class="form-control" id="nameInput" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" class="form-control" id="emailInput" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Género</label>
+        <select class="form-select" id="genderInput" disabled>
+          <option value="Hombre">Hombre</option>
+          <option value="Mujer">Mujer</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button id="btnEditar" class="btn btn-primary me-md-2" onclick="editarPerfil()">Editar perfil</button>
+        <button id="editProfileBtn" class="btn btn-success" style="display: none;">Guardar cambios</button>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button id="deleteUserBtn" class="btn btn-danger mt-3">Eliminar cuenta</button>
+      </div>
+
+
+    </div>
+
+    <hr class="my-4">
+
+    <h4 class="text-center mb-3">Agregar medidas corporales</h4>
+
+    <div class="row g-2 mb-3">
+      <div class="col-7">
+        <input type="text" id="parteCuerpo" class="form-control" placeholder="Parte del cuerpo">
+      </div>
+      <div class="col-3">
+        <input type="number" id="medida" class="form-control" placeholder="cm">
+      </div>
+      <div class="col-2">
+        <button id="addMeasureBtn" class="btn btn-success w-100">+</button>
+      </div>
+    </div>
+
+    <ul id="listaMedidas" class="list-group">
+      <!-- Medidas agregadas aparecerán aquí -->
+    </ul>
+
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./src/Perfil/profile.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BodyTrack - Home</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: white;
+      min-height: 100vh;
+    }
+    .muscle-image {
+      width: 100%;
+      max-width: 600px;
+      filter: drop-shadow(0 0 10px rgba(0,0,0,0.3));
+      opacity: 1;
+      transition: all 0.3s ease-in-out;
+    }
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .form-switch .form-check-input {
+      width: 50px;
+      height: 25px;
+    }
+    .btn-muscle {
+      min-width: 120px;
+      transition: transform 0.2s ease;
+    }
+    .btn-muscle:hover {
+      transform: scale(1.1);
+    }
+    .card {
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: none;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+    }
+
+    .card-img-top {
+      height: 160px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">BodyTrack</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="./profile.html">Perfil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./historial.html">Historial</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./login.html">Cerrar sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+      <!-- Saludo con el nombre del usuario -->
+    <div class="container mt-3 text-end">
+      <h5 id="saludoUsuario" class="text-primary"></h5>
+    </div>
+
+
+  <!-- Contenido principal -->
+  <div class="container mt-5 d-flex flex-column align-items-center">
+    <h2 class="mb-4 text-center">Selecciona el grupo muscular que deseas entrenar</h2>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+
+      <div class="col" onclick="location.href='Rutinas.html?zona=hombros'">
+        <div class="card h-100 text-center">
+          <img src="./images/hombros.png.webp" class="card-img-top p-2" alt="Hombros">
+          <div class="card-body">
+            <h5 class="card-title">Hombros</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=pecho'">
+        <div class="card h-100 text-center">
+          <img src="./images/pecho.png.jpg" class="card-img-top p-2" alt="Pecho">
+          <div class="card-body">
+            <h5 class="card-title">Pecho</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=espalda'">
+        <div class="card h-100 text-center">
+          <img src="./images/espalda.png.jpg" class="card-img-top p-2" alt="Espalda">
+          <div class="card-body">
+            <h5 class="card-title">Espalda</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=brazos'">
+        <div class="card h-100 text-center">
+          <img src="./images/brazos.png.png" class="card-img-top p-2" alt="Brazos">
+          <div class="card-body">
+            <h5 class="card-title">Brazos</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=piernas'">
+        <div class="card h-100 text-center">
+          <img src="./images/piernas.png.png" class="card-img-top p-2" alt="Piernas">
+          <div class="card-body">
+            <h5 class="card-title">Piernas</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=abdomen'">
+        <div class="card h-100 text-center">
+          <img src="./images/abdomen.png.webp" class="card-img-top p-2" alt="Abdomen">
+          <div class="card-body">
+            <h5 class="card-title">Abdomen</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=gluteos'">
+        <div class="card h-100 text-center">
+          <img src="./images/gluteos.png.png" class="card-img-top p-2" alt="Glúteos">
+          <div class="card-body">
+            <h5 class="card-title">Glúteos</h5>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col" onclick="location.href='Rutinas.html?zona=pantorrillas'">
+        <div class="card h-100 text-center">
+          <img src="./images/pantorillas.png.jpg" class="card-img-top p-2" alt="Pantorrillas">
+          <div class="card-body">
+            <h5 class="card-title">Pantorrillas</h5>
+          </div>
+        </div>
+      </div>
+    
+    </div>    
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script para cambiar imagen -->
+  <script>
+    const genderSwitch = document.getElementById('genderSwitch');
+    const muscleImage = document.getElementById('muscleImage');
+
+    // Por defecto, mostrar la imagen del hombre
+    let isFemale = false;
+
+    genderSwitch.addEventListener('change', function() {
+      isFemale = !isFemale;
+      muscleImage.src = isFemale ? "./images/mujer.png" : "./images/hombre.png";
+    });
+  </script>
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user && user.name) {
+        document.getElementById('saludoUsuario').textContent = `Hola, ${user.name}`;
+      }
+    });
+  </script>
+  
+
+</body>
+</html>

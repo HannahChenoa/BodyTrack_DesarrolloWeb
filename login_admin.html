@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BodyTrack - Admin Login</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+
+<body class="d-flex justify-content-center align-items-center">
+
+  <div class="card shadow p-4" style="width: 24rem;">
+    <h2 class="text-center mb-4">BodyTrack - Administrador</h2>
+
+    <form id="adminLoginForm">
+      <div class="mb-3">
+        <label for="adminEmail" class="form-label">Correo de administrador</label>
+        <input type="email" class="form-control" id="adminEmail" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="adminPassword" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="adminPassword" minlength="8" required>
+      </div>
+
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-dark">Entrar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script para redirigir al perfil de admin -->
+  <script>
+    const adminLoginForm = document.getElementById('adminLoginForm');
+
+    adminLoginForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // Evitar que mande submit real
+
+      // Aquí podrías validar si quieres (por ahora dejamos acceso libre)
+
+      // Redirigir manualmente al perfil de ejercicios
+      window.location.href = "./perfil_ejercicios.html";
+    });
+  </script>
+
+</body>
+</html>

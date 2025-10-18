@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BodyTrack - Administrador</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 700px;
+    }
+  </style>
+
+  <script>
+    let ejercicios = [];
+
+    function previewImage(event) {
+      const input = event.target;
+      const preview = document.getElementById('preview');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+
+      const nombre = document.getElementById('nombreEjercicio').value.trim();
+      const musculo = document.getElementById('musculoTrabajo').value.trim();
+      const descripcion = document.getElementById('descripcionEjercicio').value.trim();
+      const link = document.getElementById('linkYoutube').value.trim();
+      const imagen = document.getElementById('image').files[0];
+
+      if (!nombre || !musculo || !descripcion || !imagen) {
+        alert('Por favor completa todos los campos y selecciona una imagen.');
+        return;
+      }
+
+      const nuevoEjercicio = {
+        nombre,
+        musculo,
+        descripcion,
+        link,
+        imagenURL: URL.createObjectURL(imagen)
+      };
+
+      try {
+        const res = await fetch('/api/ejercicios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, musculo, descripcion, link })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.insertado) {
+          alert('✅ Ejercicio guardado en base de datos');
+          ejercicios.push({
+            ...data.insertado,
+            imagenURL: URL.createObjectURL(imagen)  // asegúrate que esta propiedad local exista
+          });
+        }
+        else {
+          alert('❌ Error: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Error al guardar ejercicio en DB:', err);
+        alert('❌ Error al guardar en servidor');
+      }
+
+      document.getElementById('exerciseForm').reset();
+      document.getElementById('preview').style.display = 'none';
+    }
+
+    function extraerIDYoutube(url) {
+      const match = url.match(/(?:https?:\/\/)?(?:www\.)?youtu(?:\.be|be\.com)\/(?:watch\?v=)?([^&\s]{11})/);
+      return match ? match[1] : null;
+    }
+
+
+    function actualizarLista() {
+      const lista = document.getElementById('listaEjercicios');
+      lista.innerHTML = '';
+
+      ejercicios.forEach((ejercicio, index) => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item d-flex justify-content-between align-items-start';
+        item.innerHTML = `
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">${ejercicio.nombre}</div>
+        <small>Músculo: ${ejercicio.musculo}</small><br>
+        <small>${ejercicio.descripcion}</small><br>
+        <small>Video: <a href="${ejercicio.link}" target="_blank">${ejercicio.link}</a></small><br>
+        ${ejercicio.link && extraerIDYoutube(ejercicio.link)
+            ? `<img src="https://img.youtube.com/vi/${extraerIDYoutube(ejercicio.link)}/0.jpg" style="max-width: 100px; margin-top: 5px;" />`
+            : ''
+          }
+      </div>
+      <div>
+        <button class="btn btn-sm btn-danger" onclick="eliminarEjercicioDB('${ejercicio._id}')">Eliminar</button>
+      </div>
+    `;
+        lista.appendChild(item);
+      });
+    }
+
+
+    function eliminarEjercicio(index) {
+      const ejercicio = ejercicios[index];
+      if (!ejercicio || !ejercicio._id) {
+        alert('Error: no se puede eliminar sin ID válido');
+        return;
+      }
+
+      if (confirm('¿Estás seguro de eliminar este ejercicio de la base de datos?')) {
+        eliminarEjercicioDB(ejercicio._id);
+      }
+    }
+
+    async function eliminarEjercicioDB(id) {
+      try {
+        const res = await fetch(`/api/ejercicios/${id}`, {
+          method: 'DELETE'
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert('✅ Ejercicio eliminado');
+          await cargarDesdeDB(); // recarga la lista actualizada
+        } else {
+          alert('❌ Error: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Error al eliminar ejercicio:', err);
+        alert('Error al eliminar en el servidor');
+      }
+    }
+
+
+    async function editarEjercicio(index) {
+      const ejercicio = ejercicios[index];
+
+      const nuevoNombre = prompt('Editar nombre:', ejercicio.nombre);
+      const nuevoMusculo = prompt('Editar músculo trabajado:', ejercicio.musculo);
+      const nuevaDescripcion = prompt('Editar descripción:', ejercicio.descripcion);
+      const nuevoLink = prompt('Editar link de YouTube:', ejercicio.link);
+
+      if (!nuevoNombre || !nuevoMusculo || !nuevaDescripcion || !nuevoLink) {
+        alert('No se puede dejar campos vacíos.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/ejercicios/${ejercicio._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            nombre: nuevoNombre,
+            musculo: nuevoMusculo,
+            descripcion: nuevaDescripcion,
+            link: nuevoLink
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert('✅ Ejercicio actualizado correctamente');
+
+          // Actualiza localmente
+          ejercicios[index] = {
+            ...ejercicio,
+            nombre: nuevoNombre,
+            musculo: nuevoMusculo,
+            descripcion: nuevaDescripcion,
+            link: nuevoLink
+          };
+
+          actualizarLista();
+        } else {
+          alert('❌ Error al actualizar: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Error al actualizar ejercicio:', err);
+        alert('❌ Error al conectar con el servidor');
+      }
+    }
+
+
+
+    async function cargarDesdeDB() {
+      try {
+        const res = await fetch('/api/ejercicios');
+        const data = await res.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error('Respuesta inválida');
+        }
+
+        ejercicios = data.map(ej => ({
+          ...ej,
+          imagenURL: '' // No tenemos imagen en DB, solo lo usamos para visual local
+        }));
+
+        actualizarLista();
+      } catch (err) {
+        console.error('Error al cargar ejercicios:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarDesdeDB);
+  </script>
+</head>
+
+<body class="d-flex justify-content-center align-items-center p-4">
+  <div class="card shadow p-4">
+    <h2 class="text-center mb-4">Panel de Administrador</h2>
+
+    <h5 class="mb-3">Agregar nuevo ejercicio</h5>
+
+    <form id="exerciseForm" enctype="multipart/form-data" onsubmit="handleSubmit(event)">
+      <div class="mb-3">
+        <label for="nombreEjercicio" class="form-label">Nombre del ejercicio</label>
+        <input type="text" id="nombreEjercicio" class="form-control" placeholder="Ej: Sentadillas" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="musculoTrabajo" class="form-label">Músculo trabajado</label>
+        <select id="musculoTrabajo" class="form-select" required>
+          <option value="" selected disabled>Selecciona un músculo</option>
+          <option>Pecho</option>
+          <option>Espalda</option>
+          <option>Brazos</option>
+          <option>Hombros</option>
+          <option>Piernas</option>
+          <option>Glúteos</option>
+          <option>Abdomen</option>
+          <option>Pantorrillas</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Selecciona una imagen:</label>
+        <input type="file" id="image" name="image" accept="image/*" class="form-control" onchange="previewImage(event)">
+      </div>
+
+      <div class="mb-3">
+        <img id="preview" src="#" alt="Vista previa" style="max-width: 300px; display: none;">
+      </div>
+
+      <div class="mb-3">
+        <label for="descripcionEjercicio" class="form-label">Descripción</label>
+        <textarea id="descripcionEjercicio" class="form-control" rows="2" required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="linkYoutube" class="form-label">Link de Youtube</label>
+        <input type="url" id="linkYoutube" class="form-control" placeholder="https://www.youtube.com" />
+      </div>
+
+      <div class="d-grid gap-2 mb-4">
+        <button type="submit" class="btn btn-success">Agregar ejercicio</button>
+      </div>
+    </form>
+
+    <hr>
+
+    <h5 class="mb-3">Lista de ejercicios agregados</h5>
+    <ul id="listaEjercicios" class="list-group"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

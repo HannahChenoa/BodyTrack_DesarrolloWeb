@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BodyTrack - Registro de Usuario</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+
+<body class="d-flex justify-content-center align-items-center">
+
+  <div class="card shadow p-4" style="width: 26rem;">
+    <h2 class="text-center mb-4">Crear cuenta - BodyTrack</h2>
+
+    <form id="registerForm">
+      <!-- Nombre completo -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Nombre completo</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+
+      <!-- Correo electrónico -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+      </div>
+
+      <!-- Botón Crear cuenta -->
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-success">Crear cuenta</button>
+      </div>
+
+      <!-- Link para ir al login -->
+      <div class="text-center mt-3">
+        <a href="./login.html">¿Ya tienes cuenta? Inicia sesión</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+  
+    registerForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      console.log('Formulario enviado'); 
+  
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+  
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password })
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          alert(data.message);
+          window.location.href = './login.html';
+        } else {
+          alert(data.message || 'Error en el registro');
+        }
+      } catch (error) {
+        alert('Error al conectar con el servidor');
+        console.error(error);
+      }
+    });
+  </script>
+  
+</body>
+</html>

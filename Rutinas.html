@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BodyTrack - Rutinas</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .card {
+      max-width: 900px;
+      margin: 2rem auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Botón para volver al Home -->
+  <div class="mb-4 text-center">
+    <a href="home.html" class="btn btn-secondary">← Volver al Inicio</a>
+  </div>
+
+  <!-- Botones para seleccionar zonas -->
+  <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('hombros')">Hombros</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('pecho')">Pecho</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('espalda')">Espalda</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('brazos')">Brazos</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('piernas')">Piernas</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('abdomen')">Abdomen</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('gluteos')">Glúteos</button>
+    <button type="button" class="btn btn-primary" onclick="mostrarSeccion('pantorrillas')">Pantorrillas</button>
+  </div>
+
+  <!-- Rutina personalizada -->
+  <div class="card shadow p-4 mt-4">
+    <h4>Rutina personalizada</h4>
+    <div class="mb-3">
+      <label for="nombreRutina" class="form-label">Nombre de la rutina</label>
+      <input type="text" id="nombreRutina" class="form-control" placeholder="Ej: Rutina de espalda y brazos">
+    </div>
+    <ul id="rutinaSeleccionada" class="list-group mb-3"></ul>
+    <div class="d-grid">
+      <button class="btn btn-success" onclick="guardarRutina()">Guardar rutina en historial</button>
+    </div>
+  </div>
+
+  <!-- Secciones dinámicas vacías -->
+  <div class="card shadow p-4 seccion" id="hombros" style="display:none;"><h2 class="text-center mb-4">Hombros</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="pecho" style="display:none;"><h2 class="text-center mb-4">Pecho</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="espalda" style="display:none;"><h2 class="text-center mb-4">Espalda</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="brazos" style="display:none;"><h2 class="text-center mb-4">Brazos</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="piernas" style="display:none;"><h2 class="text-center mb-4">Piernas</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="abdomen" style="display:none;"><h2 class="text-center mb-4">Abdomen</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="gluteos" style="display:none;"><h2 class="text-center mb-4">Glúteos</h2><div class="list-group"></div></div>
+  <div class="card shadow p-4 seccion" id="pantorrillas" style="display:none;"><h2 class="text-center mb-4">Pantorrillas</h2><div class="list-group"></div></div>
+
+  <!-- Modal para agregar series -->
+  <div class="modal fade" id="modalSeries" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar series para <span id="nombreEjercicioModal"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="seriesContainer"></div>
+          <button class="btn btn-outline-primary mt-2" onclick="agregarFilaSerie()"> Agregar serie</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-success" onclick="guardarSeries()">Agregar a rutina</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function extraerIDYoutube(url) {
+      const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+      return match ? match[1] : null;
+    }
+
+    function mostrarSeccion(id) {
+      document.querySelectorAll('.seccion').forEach(sec => sec.style.display = 'none');
+      const seccion = document.getElementById(id.toLowerCase());
+      if (seccion) {
+        seccion.style.display = 'block';
+      }
+    }
+
+    let ejercicioActual = '';
+    let rutina = [];
+
+    function agregarEjercicio(nombre) {
+      ejercicioActual = nombre;
+      document.getElementById('nombreEjercicioModal').textContent = nombre;
+      document.getElementById('seriesContainer').innerHTML = '';
+      agregarFilaSerie(); // crea una fila por default
+      const modal = new bootstrap.Modal(document.getElementById('modalSeries'));
+      modal.show();
+    }
+
+    function agregarFilaSerie() {
+      const container = document.getElementById('seriesContainer');
+      const row = document.createElement('div');
+      row.className = 'row mb-2';
+      row.innerHTML = `
+        <div class="col-4">
+          <input type="number" class="form-control" placeholder="Repeticiones" min="1" required>
+        </div>
+        <div class="col-4">
+          <input type="text" class="form-control" placeholder="Peso (ej. 40)" required>
+        </div>
+        <div class="col-2">
+          <select class="form-select">
+            <option value="kg">kg</option>
+            <option value="lbs">lbs</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <button class="btn btn-outline-danger" onclick="this.parentElement.parentElement.remove()">✖</button>
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+
+    function guardarSeries() {
+      const filas = document.querySelectorAll('#seriesContainer .row');
+      const series = [];
+
+      for (const fila of filas) {
+        const inputs = fila.querySelectorAll('input');
+        const rep = inputs[0]?.value;
+        const peso = inputs[1]?.value;
+        const unidad = fila.querySelector('select')?.value || 'kg';
+
+
+        if (!rep || !peso) {
+          alert('Completa todas las series');
+          return;
+        }
+
+        series.push({ repeticiones: rep, peso, unidad });
+        console.log('Serie guardada:', { repeticiones: rep, peso, unidad });
+
+      }
+
+      // ⛔️ Elimina posibles duplicados
+      rutina = rutina.filter(e => e.nombre !== ejercicioActual);
+
+      // ✅ Inserta correctamente el ejercicio con series
+      rutina.push({
+        nombre: ejercicioActual,
+        series
+      });
+
+      actualizarVistaRutina();
+      bootstrap.Modal.getInstance(document.getElementById('modalSeries')).hide();
+    }
+
+    function actualizarVistaRutina() {
+      const lista = document.getElementById('rutinaSeleccionada');
+      lista.innerHTML = '';
+
+      rutina.forEach(ej => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.innerHTML = `<strong>${ej.nombre}</strong><br>` + ej.series.map(
+          (s, i) => `Serie ${i + 1}: ${s.repeticiones} reps - ${s.peso} ${s.unidad || ''}`
+        ).join('<br>');
+        lista.appendChild(item);
+      });
+    }
+
+
+    async function guardarRutina() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        alert('Debes iniciar sesión');
+        return;
+      }
+      const nombreRutina = document.getElementById('nombreRutina').value.trim();
+
+      if (!nombreRutina || rutina.length === 0) {
+        alert('Completa los datos de la rutina');
+        return;
+      }
+      console.log("Rutina final:", rutina); // 👈 agrega esto aquí
+
+      const nuevaRutina = {
+        userId: user.id,
+        nombreRutina,
+        fecha: new Date().toISOString().split('T')[0],
+        ejercicios: rutina
+      };
+
+      try {
+        const res = await fetch('/api/history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(nuevaRutina)
+        });
+
+        let data;
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error('❌ Error al parsear JSON:', jsonErr);
+          alert('El servidor no devolvió una respuesta válida');
+          return;
+        }
+
+        if (res.ok) {
+          alert('✅ Rutina guardada');
+          window.location.href = 'historial.html';
+        } else {
+          alert('❌ Error: ' + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error al guardar la rutina');
+      }
+    }
+
+    async function cargarEjercicios() {
+      const res = await fetch('/api/ejercicios');
+      const ejercicios = await res.json();
+
+      const secciones = {
+        'Pecho': 'pecho',
+        'Espalda': 'espalda',
+        'Hombros': 'hombros',
+        'Piernas': 'piernas',
+        'Brazos': 'brazos',
+        'Abdomen': 'abdomen',
+        'Glúteos': 'gluteos',
+        'Pantorrillas': 'pantorrillas'
+      };
+
+      ejercicios.forEach(ej => {
+        const seccionId = secciones[ej.musculo];
+        if (!seccionId) return;
+
+        const seccion = document.getElementById(seccionId);
+        const contenedor = seccion.querySelector('.list-group');
+
+        const div = document.createElement('div');
+        div.className = 'list-group-item';
+        div.innerHTML = `
+          <h5>${ej.nombre}</h5>
+          <p>${ej.descripcion}</p>
+          <small>Musculo: ${ej.musculo}</small><br>
+          <a href="${ej.link}" target="_blank">Ver video</a><br>
+          ${
+            ej.link && extraerIDYoutube(ej.link)
+              ? `<img src="https://img.youtube.com/vi/${extraerIDYoutube(ej.link)}/0.jpg" style="max-width: 250px; margin-top: 5px;" />`
+              : ''
+          }
+          <br>
+          <button class="btn btn-sm btn-outline-primary mt-2"
+            onclick="agregarEjercicio('${ej.nombre}')">
+            Agregar a rutina
+          </button>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const zona = params.get('zona');
+      if (zona) mostrarSeccion(zona.toLowerCase());
+      cargarEjercicios();
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>
